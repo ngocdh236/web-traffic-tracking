@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const nodemailer = require('nodemailer');
 
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -23,10 +24,33 @@ const addTraffic = (req, res) => {
   Traffic.findById(id)
     .then(query => {
       if (query) {
-        query.visits = query.visits + 1;
+        const { web, visits } = query;
+        query.visits = visits + 1;
         query
           .save()
-          .then(() => res.status(200).json({ success: true }))
+          .then(async () => {
+            let testAccount = await nodemailer.createTestAccount();
+            let transporter = nodemailer.createTransport({
+              service: 'Gmail',
+              auth: {
+                user: 'nhimbeobeo@gmail.com',
+                type: 'OAuth2',
+                clientId: process.env.GMAIL_CLIENT_ID,
+                clientSecret: process.env.GMAIL_CLIENT_SECRET,
+                accessToken: process.env.GMAIL_ACCESS_TOKEN,
+                refreshToken: process.env.GMAIL_REFRESH_TOKEN
+              }
+            });
+
+            await transporter.sendMail({
+              from: '"Nhim" <nhimbeobeo@gmail.com>',
+              to: 'ngocdh236@gmail.com',
+              subject: 'Traffic Tracking',
+              text: `Some one visited ${web}`
+            });
+
+            return res.status(200).json({ success: true });
+          })
           .catch(err => res.status(400).json(err));
       }
     })
