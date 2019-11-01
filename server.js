@@ -23,7 +23,7 @@ const notifyTraffic = async (req, res) => {
       },
       to: 'ngocdh236@gmail.com',
       subject: 'Traffic Tracking',
-      text: `Some one visited ${name}`
+      text: `Someone visited ${name}`
     });
 
     return res.status(200).json({ success: true });
