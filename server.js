@@ -6,6 +6,9 @@ const notifyTraffic = async (req, res) => {
   const { name } = req.params;
   try {
     let transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       service: 'Gmail',
       auth: {
         type: 'OAuth2',
